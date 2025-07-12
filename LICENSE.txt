@@ -1,0 +1,30 @@
+ImageSharp, copyright of Six Labors, is licensed under the Six Labors Split License.
+It can be found at the below link:
+https://github.com/SixLabors/ImageSharp/blob/08432174cf85a3d26180c0aa2b607b9c6ff2e695/LICENSE
+The Apache license of which this use of ImageSharp falls into, can be found here:
+https://www.apache.org/licenses/LICENSE-2.0.txt
+
+Copyright 2025 rm_steele
+
+"You": The individual or representative of a Legal Entity reading this license.
+"[t]his work": The Source Code and Object Code created from the Source Code.
+"Licensor": The individual or Legal Entity granting you this License.
+
+You are granted the right to use, modify, and distribute this work under these terms:
+
+1. You acknowledge that the Licensor has no obligations to support this work.
+   Assistance in operating this work is not guaranteed nor required to be 
+   provided. This work is provided to You under "as is", under no warranty.
+   The Licensor assumes no liability for harm caused by use of this work.
+
+2. When distirbuting this work, either in its original form, modified, or
+   as a module in a larger project, you provide this license alongside it,
+   and leave a note of attribution within the Software and source code when
+   modified or used in a larger project.
+
+3. When distributing a modified version of the Source Code, clearly indicate
+   what changes you made in the Source Code to differentiate it from this work's
+   original content.
+
+Where not specified in these terms, you are allowed to leverage this work to your 
+heart's content. goodnight mystical
