@@ -1,0 +1,6 @@
+**.lnk
+[Bb]in/
+[Oo]bj/
+.vs/
+**.user
+Properties/launchSettings.json
