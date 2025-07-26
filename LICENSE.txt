@@ -17,9 +17,9 @@ You are granted the right to use, modify, and distribute this work under these t
    provided. This work is provided to You under "as is", under no warranty.
    The Licensor assumes no liability for harm caused by use of this work.
 
-2. When distirbuting this work, either in its original form, modified, or
+2. When distributing this work, either in its original form, modified, or
    as a module in a larger project, you provide this license alongside it,
-   and leave a note of attribution within the Software and source code when
+   and leave a note of attribution within the Software and Source Code when
    modified or used in a larger project.
 
 3. When distributing a modified version of the Source Code, clearly indicate
