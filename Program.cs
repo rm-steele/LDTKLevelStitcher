@@ -15,7 +15,7 @@ namespace LDTKLevelStitcher
         
         static int Main(string[] args)
         {
-            int[] version = [1, 0, 0];
+            int[] version = [1, 1, 0];
             string usageString =
             """
             Usage: LDTKLevelStitcher [-qsfoO] <World file path> <PNG directory path>
@@ -30,10 +30,13 @@ namespace LDTKLevelStitcher
                   string. regex101.com is good at helping build these if you aren't familiar.
                 -o: Order rooms by depth, with rooms of a smaller depth value drawing over larger values.
                 -O: Order rooms by depth, with rooms of a larger depth value drawing over smaller values.
+                -i ####x####: Force the output image to be a certain size, with trailing space being added to
+                  or removed from the bottom and right sides. Formatted as <NUMBER1>x<NUMBER2> with no spaces.
+                  Use 0 to leave the size unchanged in that axis.
                 -- : Stop porcessing arguments. For if your file path begins with - for some reason.
                 World file path: The path to the .ldtk file that the PNGs are from.
                 PNG directory path: The path to the directory containing the PNG images,
-                obtained by telling them to be exported in Project Settings > Extra Files.
+                  obtained by telling them to be exported in Project Settings > Extra Files.
             """;
             string helpString =
             """
@@ -55,6 +58,7 @@ namespace LDTKLevelStitcher
             int ordering = 0; // 0 is no ordering, 1 is ascending, -1 is descending
             int verbosity = 1; // 0 = quiet, 2 = loud
             string filter = "";
+            int[] imgSize = [0, 0];
 
             #region arg handling
             int j = 1; // lookahead iterator
@@ -125,6 +129,22 @@ namespace LDTKLevelStitcher
                                 case "--verbose":
                                     verbosity++;
                                     break;
+                                case "-i":
+                                    if (j == args.Length)
+                                    {
+                                        Console.WriteLine("fatal: No parameter follows argument " + arg);
+                                        return 1;
+                                    }
+                                    var success = true;
+                                    success &= int.TryParse(args[j].Split('x')[0], out imgSize[0]);
+                                    success &= int.TryParse(args[j].Split('x')[1], out imgSize[1]);
+                                    if (!success)
+                                    {
+                                        Console.WriteLine("fatal: Failed to parse parameter as size string: " + args[j]);
+                                        return 1;
+                                    }
+                                    parameter = true;
+                                    break;
                                 case "--":
                                     noMoreArgs = true;
                                     break;
@@ -176,6 +196,24 @@ namespace LDTKLevelStitcher
                                     }
                                     filter = args[j];
                                     parameter = true;
+                                }
+                                if (ltr == 'i')
+                                {
+                                    if (j == args.Length)
+                                    {
+                                        Console.WriteLine("fatal: No parameter follows argument " + arg);
+                                        return 1;
+                                    }
+                                    var success = true;
+                                    success &= int.TryParse(args[j].Split('x')[0], out imgSize[0]);
+                                    success &= int.TryParse(args[j].Split('x')[1], out imgSize[1]);
+                                    if (!success)
+                                    {
+                                        Console.WriteLine("fatal: Failed to parse parameter as size string: " + args[j]);
+                                        return 1;
+                                    }
+                                    parameter = true;
+                                    break;
                                 }
                             }
                         }
@@ -314,18 +352,21 @@ namespace LDTKLevelStitcher
             if (ordering == -1)
                 (maxDepth, minDepth) = (minDepth, maxDepth);
 
+            if (imgSize[0] < 1) imgSize[0] = borderRight - borderLeft;
+            if (imgSize[1] < 1) imgSize[1] = borderBottom - borderTop;
+
             GraphicsOptions ops = new();
             ops.AlphaCompositionMode = PixelAlphaCompositionMode.Src;
             if (verbosity > 1) Console.WriteLine("Starting image generation");
             if (verbosity > 1) Console.WriteLine("min depth is " + minDepth + " and max depth is " + maxDepth);
-            using (Image<Rgba32> canvas = new(borderRight - borderLeft, borderBottom - borderTop))
+            using (Image<Rgba32> canvas = new(imgSize[0], imgSize[1]))
             {
                 for (int d = minDepth;;)
                 {
-                    if (verbosity > 1) Console.WriteLine("Drawing rooms at depth " + d);
+                    if (verbosity > 1 && ordering != 0) Console.WriteLine("Drawing rooms at depth " + d);
                     foreach (KeyValuePair<string, Level> level in levelInfo)
                     {
-                        if (level.Value.depth != d) continue;
+                        if (level.Value.depth != d && ordering != 0) continue;
                         if (verbosity > 0) Console.WriteLine("Drawing room: " + level.Key);
                         try
                         {
@@ -334,16 +375,17 @@ namespace LDTKLevelStitcher
                         }
                         catch (Exception ex)
                         {
-                            if (verbosity > 0) Console.WriteLine("Could not load room " + imgPath + level.Key +".png: " + ex.ToString());
+                            if (verbosity > 1) Console.WriteLine("Could not load room " + imgPath + level.Key +".png:\n" + ex.ToString());
+                            else if (verbosity > 0) Console.WriteLine("Could not load room " + imgPath + level.Key + ".png!");
                         }
                     }
                     d += ordering;
-                    if ((ordering == 1 && d > maxDepth) || (ordering == -1 && d < maxDepth))
+                    if ((ordering == 1 && d > maxDepth) || (ordering == -1 && d < maxDepth) || ordering == 0)
                         break;
                 }
                 if (scaleDenom != 1)
                     canvas.Mutate(x => x.Resize((int)(canvas.Width / scaleDenom), (int)(canvas.Height / scaleDenom), KnownResamplers.NearestNeighbor));
-                if (verbosity > 1) Console.WriteLine("Saving the output image");
+                if (verbosity > 0) Console.WriteLine("Saving the output image");
                 canvas.Save("map.png");
             }
 

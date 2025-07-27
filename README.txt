@@ -20,6 +20,9 @@ Arguments:
       string. regex101.com is good at helping build these if you aren't familiar.
     -o: Order rooms by depth, with rooms of a smaller depth value drawing over larger values.
     -O: Order rooms by depth, with rooms of a larger depth value drawing over smaller values.
+    -i ####x####: Force the output image to be a certain size, with trailing space being added to
+      or removed from the bottom and right sides. Formatted as <NUMBER1>x<NUMBER2> with no spaces.
+      Use 0 to leave the size unchanged in that axis.
     -- : Stop porcessing arguments. For if your file path begins with - for some reason.
     World file path: The path to the .ldtk file that the PNGs are from.
     PNG directory path: The path to the directory containing the PNG images,
